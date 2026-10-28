@@ -18,6 +18,9 @@ const SUGGESTIONS = [
 export const clear = internalMutation({
   args: {},
   handler: async (ctx) => {
+    for (const row of await ctx.db.query("votes").take(500)) {
+      await ctx.db.delete(row._id);
+    }
     for (const row of await ctx.db.query("suggestions").take(500)) {
       await ctx.db.delete(row._id);
     }
