@@ -15,6 +15,7 @@ export const list = query({
           .take(1000);
         return {
           ...suggestion,
+          planned: suggestion.planned ?? false,
           votes: votes.length,
           voted: voter !== undefined && votes.some((vote) => vote.voter === voter),
         };
@@ -35,7 +36,16 @@ export const add = mutation({
   },
 });
 
-// One vote per browser: voting again takes the vote back.
+// Anyone can mark a suggestion Planned for now; the board has no sign-in.
+export const setPlanned = mutation({
+  args: { suggestionId: v.id("suggestions"), planned: v.boolean() },
+  handler: async (ctx, { suggestionId, planned }) => {
+    await ctx.db.patch(suggestionId, { planned });
+  },
+});
+
+// One vote per browser: voting again takes the vote back. Planned suggestions still take votes,
+// so the count can rank which planned item ships first.
 export const vote = mutation({
   args: { suggestionId: v.id("suggestions"), voter: v.string() },
   handler: async (ctx, { suggestionId, voter }) => {

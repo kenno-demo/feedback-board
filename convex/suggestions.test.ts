@@ -40,6 +40,26 @@ test("the board puts the most votes first", async () => {
   expect(board.map((s) => s.title)).toEqual(["Older, more votes", "Newer, no votes"]);
 });
 
+test("a suggestion can be marked Planned and back", async () => {
+  const t = convexTest(schema, modules);
+  const suggestionId = await t.mutation(api.suggestions.add, { title: "Dark mode" });
+  expect(await t.query(api.suggestions.list, {})).toMatchObject([{ planned: false }]);
+  await t.mutation(api.suggestions.setPlanned, { suggestionId, planned: true });
+  expect(await t.query(api.suggestions.list, {})).toMatchObject([{ planned: true }]);
+  await t.mutation(api.suggestions.setPlanned, { suggestionId, planned: false });
+  expect(await t.query(api.suggestions.list, {})).toMatchObject([{ planned: false }]);
+});
+
+test("a Planned suggestion still takes votes", async () => {
+  const t = convexTest(schema, modules);
+  const suggestionId = await t.mutation(api.suggestions.add, { title: "Dark mode" });
+  await t.mutation(api.suggestions.setPlanned, { suggestionId, planned: true });
+  await t.mutation(api.suggestions.vote, { suggestionId, voter: "a" });
+  expect(await t.query(api.suggestions.list, { voter: "a" })).toMatchObject([
+    { planned: true, votes: 1, voted: true },
+  ]);
+});
+
 test("the seed fills an empty board once", async () => {
   const t = convexTest(schema, modules);
   await t.mutation(internal.seed.run, {});
