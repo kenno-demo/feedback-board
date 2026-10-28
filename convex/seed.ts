@@ -1,16 +1,17 @@
 import { internalMutation } from "./_generated/server";
 
-const SUGGESTIONS = [
-  "Dark mode",
-  "Export to CSV",
-  "Slack notifications",
-  "Keyboard shortcuts",
-  "Google Calendar sync",
-  "Two-factor authentication",
-  "Bulk edit",
-  "Public API",
-  "Mobile app",
-  "Custom fields",
+// Each suggestion with the number of seeded votes it starts with.
+const SUGGESTIONS: [string, number][] = [
+  ["Dark mode", 42],
+  ["Export to CSV", 31],
+  ["Slack notifications", 27],
+  ["Keyboard shortcuts", 19],
+  ["Google Calendar sync", 16],
+  ["Two-factor authentication", 14],
+  ["Bulk edit", 9],
+  ["Public API", 8],
+  ["Mobile app", 5],
+  ["Custom fields", 3],
 ];
 
 // Empties every table. The demo reset runs it before deploying the golden code, so leftover
@@ -18,8 +19,10 @@ const SUGGESTIONS = [
 export const clear = internalMutation({
   args: {},
   handler: async (ctx) => {
-    for (const row of await ctx.db.query("suggestions").take(500)) {
-      await ctx.db.delete(row._id);
+    for (const table of ["votes", "suggestions"] as const) {
+      for (const row of await ctx.db.query(table).take(4000)) {
+        await ctx.db.delete(row._id);
+      }
     }
   },
 });
@@ -29,8 +32,11 @@ export const run = internalMutation({
   args: {},
   handler: async (ctx) => {
     if (await ctx.db.query("suggestions").first()) return;
-    for (const title of SUGGESTIONS) {
-      await ctx.db.insert("suggestions", { title });
+    for (const [title, votes] of SUGGESTIONS) {
+      const suggestionId = await ctx.db.insert("suggestions", { title });
+      for (let i = 0; i < votes; i++) {
+        await ctx.db.insert("votes", { suggestionId, voter: `seed-${i}` });
+      }
     }
   },
 });
