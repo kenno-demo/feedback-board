@@ -65,3 +65,23 @@ li {
   padding: 14px 0;
   border-bottom: 1px solid var(--border);
 }
+
+.vote {
+  min-width: 56px;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: inherit;
+  font-variant-numeric: tabular-nums;
+}
+
+.vote.voted {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: white;
+}
+
+.vote:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
