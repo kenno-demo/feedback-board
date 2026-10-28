@@ -83,3 +83,25 @@ li {
   border-color: var(--accent);
   color: var(--accent);
 }
+
+.title {
+  flex: 1;
+}
+
+.badge {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.plan {
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: inherit;
+  font-size: 13px;
+  font-weight: 500;
+}

@@ -23,6 +23,7 @@ export default function Board() {
   const suggestions = useQuery(api.suggestions.list, voter ? { voter } : "skip");
   const add = useMutation(api.suggestions.add);
   const vote = useMutation(api.suggestions.vote);
+  const setPlanned = useMutation(api.suggestions.setPlanned);
   const [title, setTitle] = useState("");
 
   async function submit(event: FormEvent) {
@@ -63,7 +64,18 @@ export default function Board() {
                 <span aria-hidden>▲</span>
                 {suggestion.votes}
               </button>
-              <span>{suggestion.title}</span>
+              <span className="title">{suggestion.title}</span>
+              {suggestion.planned && <span className="badge">Planned</span>}
+              <button
+                type="button"
+                className="plan"
+                aria-pressed={suggestion.planned === true}
+                onClick={() =>
+                  setPlanned({ suggestionId: suggestion._id, planned: !suggestion.planned })
+                }
+              >
+                {suggestion.planned ? "Unplan" : "Mark planned"}
+              </button>
             </li>
           ))}
         </ul>

@@ -35,6 +35,15 @@ export const add = mutation({
   },
 });
 
+// Marks a suggestion as Planned, or takes the mark off. No sign-in yet, so anyone can set it.
+// Planned suggestions keep taking votes: the count ranks which planned one ships first.
+export const setPlanned = mutation({
+  args: { suggestionId: v.id("suggestions"), planned: v.boolean() },
+  handler: async (ctx, { suggestionId, planned }) => {
+    await ctx.db.patch(suggestionId, { planned });
+  },
+});
+
 // One vote per browser: voting again takes the vote back.
 export const vote = mutation({
   args: { suggestionId: v.id("suggestions"), voter: v.string() },
